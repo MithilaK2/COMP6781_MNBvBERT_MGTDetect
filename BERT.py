@@ -6,7 +6,7 @@ from transformers import BertTokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Path to JSONL files TO BE MODIFIED LATER SO CAN LOAD VIA COMMANDLINE
-# MUST ALSO LOAD GENAI DATA AND SPLIT TRAIN DATA BY TRAIN 80%, 20%
+# MUST ALSO LOAD GENAI DATA AND SPLIT TRAIN DATA BY TRAIN 80%, VAL 20%
 train_file_path = 'SemEval_data/subtaskA_train_monolingual.jsonl'
 val_file_path = 'SemEval_data/subtaskA_dev_monolingual.jsonl'
 
