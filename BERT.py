@@ -123,8 +123,9 @@ class BERT_Text_Classifier(nn.Module):
         self.linear = nn.Linear(self.hidden_dim, num_classes)  # linear layer for classification
 
     def forward(self, input_ids, attention_mask):
-        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)  # pass input through BERT (feedforward
-        cls_output = outputs[1]  # get [CLS] token output for classification DOCUMENTATION
+        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)  # pass input through BERT (feedforward) DOCUMENTATION
+        cls_output = outputs[1]  # get [CLS] token output for classification, it is a pooled output (summary of the input sequence) for classification  DOCUMENTATION
+        # note outputs[0] gives the last hidden states for all tokens
         out = self.linear(cls_output)  # Pass through linear layer
         return out  # return logit outputs
 
