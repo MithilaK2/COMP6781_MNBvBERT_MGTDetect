@@ -101,15 +101,9 @@ train_data = preprocess_function(train_texts, bert_tokenizer)
 val_data = preprocess_function(val_texts, bert_tokenizer)
 test_data = preprocess_function(test_texts, bert_tokenizer)
 
-
-
-
 # Convert training and validation labels to PyTorch tensors for model input
 train_label_data = torch.tensor(train_labels)
 val_label_data = torch.tensor(val_labels)
-
-
-
 
 # --DEFINE MODEL--
 class BERT_Text_Classifier(nn.Module):
