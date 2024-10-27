@@ -185,7 +185,6 @@ def evaluate(model, val_dataloader, device):
     return accuracy
 
 # Initialize model, loss function, and optimizer
-
 device = torch.device("cuda" if torch.cuda.is_available()
                       else "mps" if torch.backends.mps.is_available()
                       else "cpu") # creates device #CAUTION: RUN THIS CODE WITH GPU, CPU WILL TAKE TOO LONG
