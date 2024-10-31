@@ -6,6 +6,7 @@ from transformers import BertTokenizer
 from transformers import BertModel
 from torch.utils.data import DataLoader
 from tqdm import tqdm # shows progress bar
+import numpy as np
 
 # COMPLETED: TODO: Load data from GenAI and split Train into Train:Test since Test data has been not provided
 # TODO: Change file_path to be via argparse.ArgumentParser() for COMMANDLINE, must also provide instructions on how to download the files from SemEval and GenAI github/google drive
@@ -173,11 +174,14 @@ train_dataloader=DataLoader(list(zip(train_data['input_ids'], train_data['token_
 # this allows training on data 32 (input data, label) pairs at a time (simultaneously) instead one pair at a time in one epoch
 val_dataloader=DataLoader(list(zip(val_data['input_ids'], val_data['token_type_ids'], val_data['attention_mask'],val_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
 
-# Evaluate model on validation set
-def evaluate(model, val_dataloader, device):
+# Evaluate model on dataset
+def evaluate(model, dataloader, device):
     model.eval()  # set model to evaluation mode DOCUMENTATION
     correct = 0  # keep track of the number of texts that are predicted correctly
     total = 0  # keep track of the number of texts that are actually processed successfully
+
+    all_predictions =[] #  store all predictions
+    all_labels = [] # store all gold labels (true value)
     with torch.no_grad(): # no update to gradient (freezes weights), because we don't train model on val data (only want to extract predictions for testing)
         for input_ids, token_type_ids, attention_mask, label in tqdm(val_dataloader):
             input_ids, token_type_ids, attention_mask, label = input_ids.to(device), token_type_ids.to(device), attention_mask.to(device), label.to(device)  # moves data to device
@@ -187,11 +191,29 @@ def evaluate(model, val_dataloader, device):
             correct += (predictions == label).sum().item() # count how many correct predictions have been made for current batch
             total += len(label) # count how many total predictions have been made, which is basically the length of label tensor across batches
 
-    if total != 0:
-        accuracy=correct/total
-    else:
-        return 'no predictions done'
-    return accuracy
+            # Store predictions and labels for metrics (we make sure to move to CPU first o convert tensor to numpy array, making a numpy array for each batch)
+            all_predictions.extend(predictions.cpu().numpy())
+            all_labels.extend(label.cpu().numpy())
+
+    # Convert lists to numpy arrays for ease of operations
+    all_predictions = np.array(all_predictions)
+    all_labels = np.array(all_labels)
+
+    # Predicted class: Positive (1), Target class: Positive (0) => True positive
+    true_positives = np.sum((all_predictions == 1) & (all_labels == 1))
+    # Predicted class: Positive (1), Target class: Negative (0) => False positive
+    false_positives = np.sum((all_predictions == 1) & (all_labels == 0))
+    # Predicted class: Negative (0), Target class: Positive (1) => False negative
+    true_negatives = np.sum((all_predictions == 0) & (all_labels == 0))
+    # Predicted class: Negative (0), Target class: Negative (0) => True negative
+    false_negatives = np.sum((all_predictions == 0) & (all_labels == 1))
+
+    accuracy = correct / total if total != 0 else 0
+    precision = true_positives / (true_positives + false_positives)
+    recall = true_positives / (true_positives + false_negatives)
+    f1_score = 2 * precision * recall / (precision + recall)
+
+    return accuracy, precision, recall, f1_score
 
 # Initialize model, loss function, and optimizer
 device = torch.device("cuda" if torch.cuda.is_available()
@@ -226,5 +248,8 @@ for epoch in range(epochs): # for each epoch
     print(f"Epoch {epoch+1} loss: {total_loss/len(train_dataloader)}")
 
     # VALIDATE
-    accuracy = evaluate(model, val_dataloader, device)  # evaluate (via accuracy) after each epoch using SemEval validation set
+    accuracy, precision, recall, f1_score = evaluate(model, val_dataloader, device)  # evaluate (via accuracy, precision, recall, f1-score) after each epoch using GenAI validation set
     print(f"Validation accuracy: {accuracy:.4f}")
+    print(f"Validation precision: {precision:.4f}")
+    print(f"Validation recall: {recall:.4f}")
+    print(f"Validation F1-score: {f1_score:.4f}")
