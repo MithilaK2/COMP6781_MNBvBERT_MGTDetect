@@ -8,7 +8,6 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm # shows progress bar
 import numpy as np
 
-# COMPLETED: TODO: Load data from GenAI and split Train into Train:Test since Test data has been not provided
 # TODO: Change file_path to be via argparse.ArgumentParser() for COMMANDLINE, must also provide instructions on how to download the files from SemEval and GenAI github/google drive
 
 #--LOAD DATA--
