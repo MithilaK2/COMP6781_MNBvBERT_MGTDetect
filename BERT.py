@@ -166,12 +166,15 @@ class BERT_Text_Classifier(nn.Module):
 #creation of dataloader for training
 train_data = GenAI_train_data # chosen train data (SemEval or GenAI)
 train_label_data = GenAI_train_label_data # chosen (labels of) train data (SemEval or GenAI)
+
 batch_size = 16 # batch size
-train_dataloader=DataLoader(list(zip(train_data['input_ids'], train_data['token_type_ids'], train_data['attention_mask'],train_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
+
 # DataLoader is a utility that handles batching and shuffling of data during training.
-# this allows training on data 32 (input data, label) pairs at a time (simultaneously) instead one pair at a time in one epoch
-SemEval_val_dataloader=DataLoader(list(zip(SemEval_val_data['input_ids'], SemEval_val_data['token_type_ids'], SemEval_val_data['attention_mask'],SemEval_val_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
-GenAI_val_dataloader=DataLoader(list(zip(GenAI_val_data['input_ids'], GenAI_val_data['token_type_ids'], GenAI_val_data['attention_mask'],GenAI_val_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
+# this allows training/validation/testing on data [batch_size] (input data, label) pairs at a time (simultaneously) instead one pair at a time in one epoch
+train_dataloader=DataLoader(list(zip(train_data['input_ids'], train_data['token_type_ids'], train_data['attention_mask'],train_label_data)),batch_size=batch_size,shuffle=True) # dataloader for train
+SemEval_val_dataloader=DataLoader(list(zip(SemEval_val_data['input_ids'], SemEval_val_data['token_type_ids'], SemEval_val_data['attention_mask'],SemEval_val_label_data)),batch_size=batch_size,shuffle=True) # dataloader for SemEval validation
+GenAI_val_dataloader=DataLoader(list(zip(GenAI_val_data['input_ids'], GenAI_val_data['token_type_ids'], GenAI_val_data['attention_mask'],GenAI_val_label_data)),batch_size=batch_size,shuffle=True) # dataloader for GenAI validation
+
 # Evaluate model on dataset
 def evaluate(model, dataloader, device):
     model.eval()  # set model to evaluation mode DOCUMENTATION
@@ -207,10 +210,10 @@ def evaluate(model, dataloader, device):
     # Predicted class: Negative (0), Target class: Negative (0) => True negative
     false_negatives = np.sum((all_predictions == 0) & (all_labels == 1))
 
-    accuracy = correct / total if total != 0 else 0
-    precision = true_positives / (true_positives + false_positives)
-    recall = true_positives / (true_positives + false_negatives)
-    f1_score = 2 * precision * recall / (precision + recall)
+    accuracy = correct / total if total != 0 else 0 # calculate accuracy
+    precision = true_positives / (true_positives + false_positives) # calculate precision
+    recall = true_positives / (true_positives + false_negatives) # calculate recall
+    f1_score = 2 * precision * recall / (precision + recall) # calculate f1-score
 
     return accuracy, precision, recall, f1_score
 
