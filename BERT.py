@@ -34,63 +34,56 @@ def get_texts_labels(file_path):
 
     return texts, labels
 
-
-# Get text data from JSONL file (for test set)
-def get_texts(file_path):
-    """
-    Method to extract texts from a JSONL file.
-    Args:
-    file_path : str : path to the JSONL file
-
-    Returns:
-    texts : list : list of text samples
-    """
-    texts = []
-
-    # Open and read JSONL file
-    with open(file_path, 'r') as f:
-        for line in f:
-            record = json.loads(line.strip())  # parse each line from a JSON-formatted string into a dictionary after removing leading and trailing whitespace or newline characters
-            texts.append(record['text'])  # append 'text' field to texts list
-
-    return texts
-
 # Path to JSONL files (can be modified later to load via command line)
 SemEval_train_file_path = 'SemEval_data/subtaskA_train_monolingual.jsonl' # SemEval train
 SemEval_val_file_path = 'SemEval_data/subtaskA_dev_monolingual.jsonl' # SemEval val
 SemEval_test_file_path = 'SemEval_data/subtaskA_monolingual.jsonl' # SemEval test
 GenAI_train_file_path = 'GenAI_data/en_train.jsonl' # GenAI train
 GenAI_val_file_path = 'GenAI_data/en_dev.jsonl' # GenAI val
-GenAI_test_file_path = 'GenAI_data/en_devtest_text_id_only.jsonl' # GenAI test
 
 # Create the datasets and corresponding labels (if applicable)
 SemEval_train_texts, SemEval_train_labels = get_texts_labels(SemEval_train_file_path) # SemEval train
 SemEval_val_texts, SemEval_val_labels = get_texts_labels(SemEval_val_file_path) # SemEval val
-SemEval_test_texts = get_texts(SemEval_test_file_path)  # SemEval test, we use get_texts for the test set (no labels)
+SemEval_test_texts, SemEval_test_labels = get_texts_labels(SemEval_test_file_path)  # SemEval test, we use get_texts for the test set (no labels)
 GenAI_train_texts, GenAI_train_labels = get_texts_labels(GenAI_train_file_path) # GenAI train
 GenAI_val_texts, GenAI_val_labels = get_texts_labels(GenAI_val_file_path) # GenAI val
-GenAI_test_texts = get_texts(GenAI_test_file_path)  # GenAI test, we use get_texts for the test set (no labels)
+# Randomly sample (via stratified sampling) GenAI train and val data so that it is a manageable subset for hyperparameter tuning (faster runtimes for quicker results)
+# Split GenAI train data into new train and test sets
+GenAI_train_data, GenAI_test_data = train_test_split(
+    list(zip(GenAI_train_texts, GenAI_train_labels)),  # combine data and labels for sampling
+    test_size=0.1,  # 10% for test
+    stratify=GenAI_train_labels,  # maintain class balance
+    random_state=42  # for reproducibility
+)
+# Unzip the new train and test sets
+GenAI_train_texts, GenAI_train_labels = map(list, zip(*GenAI_train_data))
+GenAI_test_texts, GenAI_test_labels = map(list, zip(*GenAI_test_data))
+
+# Merge SemEval and GenAI train data
+merged_train_texts = SemEval_train_texts + GenAI_train_texts
+merged_train_labels = SemEval_train_labels + GenAI_train_labels
 
 # Randomly sample (via stratified sampling) GenAI train and val data so that it is a manageable subset for hyperparameter tuning (faster runtimes for quicker results)
 # Stratified sampling for GenAI train data
-train_data, _ = train_test_split( # we are only interested in the train data portion, we don't need the other portion (which is usually test)
+sampled_train_data, _ = train_test_split( # we are only interested in the train data portion, we don't need the other portion (which is usually test)
     list(zip(GenAI_train_texts, GenAI_train_labels)),  # combine data and labels for sampling
     train_size=len(SemEval_train_texts), # sample size based on SemEval train length
     stratify=GenAI_train_labels,  # stratify to maintain class balance (i.e. not have one class over-represented)
     random_state=42  # for reproducibility
 )
 # Unzip the sampled data and labels
-GenAI_train_texts, GenAI_train_labels = map(list, zip(*train_data)) # note unzipped version returns a tuple, must convert it into a list to match rest of data manipulation
+GenAI_sampled_train_texts, GenAI_sampled_train_labels = map(list, zip(*sampled_train_data)) # note unzipped version returns a tuple, must convert it into a list to match rest of data manipulation
 
 # Stratified sampling for GenAI val data
-val_data, _ = train_test_split( # we are only interested in the train data portion (in this case, val), we don't need the other portion (which is usually test)
+sampled_val_data, _ = train_test_split( # we are only interested in the train data portion (in this case, val), we don't need the other portion (which is usually test)
     list(zip(GenAI_val_texts, GenAI_val_labels)),  # combine data and labels for sampling
     train_size=len(SemEval_val_texts), # sample size based on SemEval val length
     stratify=GenAI_val_labels,  # stratify to maintain class balance (i.e. not have one class over-represented)
     random_state=42  # for reproducibility
 )
 # Unzip the sampled data and labels
-GenAI_val_texts, GenAI_val_labels = map(list, zip(*val_data)) # note unzipped version returns a tuple, must convert it into a list to match rest of data manipulation
+GenAI_sampled_val_texts, GenAI_sampled_val_labels = map(list, zip(*sampled_val_data)) # note unzipped version returns a tuple, must convert it into a list to match rest of data manipulation
+
 
 #--PREPROCESS DATA--
 # Define BERT's tokenizer
@@ -131,12 +124,20 @@ SemEval_test_data = preprocess_function(SemEval_test_texts, bert_tokenizer)
 GenAI_train_data = preprocess_function(GenAI_train_texts, bert_tokenizer)
 GenAI_val_data = preprocess_function(GenAI_val_texts, bert_tokenizer)
 GenAI_test_data = preprocess_function(GenAI_test_texts, bert_tokenizer)
+merged_train_data = preprocess_function(merged_train_texts, bert_tokenizer)
+GenAI_sampled_train_data = preprocess_function(GenAI_sampled_train_texts, bert_tokenizer)
+GenAI_sampled_val_data = preprocess_function(GenAI_sampled_val_texts, bert_tokenizer)
 
-# Convert training and validation labels to PyTorch tensors for model input
+# Convert training, validation and test labels to PyTorch tensors for model input
 SemEval_train_label_data = torch.tensor(SemEval_train_labels)
 SemEval_val_label_data = torch.tensor(SemEval_val_labels)
+SemEval_test_label_data = torch.tensor(SemEval_test_labels)
 GenAI_train_label_data = torch.tensor(GenAI_train_labels)
 GenAI_val_label_data = torch.tensor(GenAI_val_labels)
+GenAI_test_label_data = torch.tensor(GenAI_test_labels)
+merged_train_label_data = torch.tensor(merged_train_labels)
+GenAI_sampled_train_label_data = torch.tensor(GenAI_sampled_train_labels)
+GenAI_sampled_val_label_data = torch.tensor(GenAI_sampled_val_labels)
 
 # --DEFINE MODEL--
 class BERT_Text_Classifier(nn.Module):
@@ -165,14 +166,12 @@ class BERT_Text_Classifier(nn.Module):
 #creation of dataloader for training
 train_data = GenAI_train_data # chosen train data (SemEval or GenAI)
 train_label_data = GenAI_train_label_data # chosen (labels of) train data (SemEval or GenAI)
-val_data = GenAI_val_data # chosen val data (SemEval or GenAI)
-val_label_data = GenAI_val_label_data # chosen (labels of) val data (SemEval or GenAI)
-batch_size = 64
+batch_size = 16 # batch size
 train_dataloader=DataLoader(list(zip(train_data['input_ids'], train_data['token_type_ids'], train_data['attention_mask'],train_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
 # DataLoader is a utility that handles batching and shuffling of data during training.
 # this allows training on data 32 (input data, label) pairs at a time (simultaneously) instead one pair at a time in one epoch
-val_dataloader=DataLoader(list(zip(val_data['input_ids'], val_data['token_type_ids'], val_data['attention_mask'],val_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
-
+SemEval_val_dataloader=DataLoader(list(zip(SemEval_val_data['input_ids'], SemEval_val_data['token_type_ids'], SemEval_val_data['attention_mask'],SemEval_val_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
+GenAI_val_dataloader=DataLoader(list(zip(GenAI_val_data['input_ids'], GenAI_val_data['token_type_ids'], GenAI_val_data['attention_mask'],GenAI_val_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
 # Evaluate model on dataset
 def evaluate(model, dataloader, device):
     model.eval()  # set model to evaluation mode DOCUMENTATION
@@ -182,7 +181,7 @@ def evaluate(model, dataloader, device):
     all_predictions =[] #  store all predictions
     all_labels = [] # store all gold labels (true value)
     with torch.no_grad(): # no update to gradient (freezes weights), because we don't train model on val data (only want to extract predictions for testing)
-        for input_ids, token_type_ids, attention_mask, label in tqdm(val_dataloader):
+        for input_ids, token_type_ids, attention_mask, label in tqdm(dataloader):
             input_ids, token_type_ids, attention_mask, label = input_ids.to(device), token_type_ids.to(device), attention_mask.to(device), label.to(device)  # moves data to device
 
             log_probs = model(input_ids, attention_mask, token_type_ids) # feedforward: run forward function of model on input texts and outputs 2 logits (for each class) per text/sample in batch
@@ -198,6 +197,7 @@ def evaluate(model, dataloader, device):
     all_predictions = np.array(all_predictions)
     all_labels = np.array(all_labels)
 
+    # Note: Human text: Label 0; Machine text: Label 1
     # Predicted class: Positive (1), Target class: Positive (0) => True positive
     true_positives = np.sum((all_predictions == 1) & (all_labels == 1))
     # Predicted class: Positive (1), Target class: Negative (0) => False positive
@@ -218,10 +218,10 @@ def evaluate(model, dataloader, device):
 device = torch.device("cuda" if torch.cuda.is_available()
                       else "mps" if torch.backends.mps.is_available()
                       else "cpu") # creates device #CAUTION: RUN THIS CODE WITH GPU, CPU WILL TAKE TOO LONG
-model = BERT_Text_Classifier(2).to(device) # moves initialized model (binary classifier where Machine text = label 0 and Human text = label 1) to device
+model = BERT_Text_Classifier(2).to(device) # moves initialized model (binary classifier where Machine text = label 1 and Human text = label 0) to device
 loss_function = nn.CrossEntropyLoss() # initialize loss function (which is Cross Entropy)
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-4) # better version of SGD (Stochastic Gradient Descent)
-epochs = 4 # define maximum number of epochs
+optimizer = torch.optim.Adam(model.parameters(), lr=2e-5) # better version of SGD (Stochastic Gradient Descent)
+epochs = 3 # define maximum number of epochs
 
 # Training loop
 for epoch in range(epochs): # for each epoch
@@ -247,8 +247,15 @@ for epoch in range(epochs): # for each epoch
     print(f"Epoch {epoch+1} loss: {total_loss/len(train_dataloader)}")
 
     # VALIDATE
-    accuracy, precision, recall, f1_score = evaluate(model, val_dataloader, device)  # evaluate (via accuracy, precision, recall, f1-score) after each epoch using GenAI validation set
-    print(f"Validation accuracy: {accuracy:.4f}")
-    print(f"Validation precision: {precision:.4f}")
-    print(f"Validation recall: {recall:.4f}")
-    print(f"Validation F1-score: {f1_score:.4f}")
+    # SemEval
+    accuracy, precision, recall, f1_score = evaluate(model, SemEval_val_dataloader, device)  # evaluate (via accuracy, precision, recall, f1-score) after each epoch using GenAI validation set
+    print(f"SemEval validation accuracy: {accuracy:.4f}")
+    print(f"SemEval validation precision: {precision:.4f}")
+    print(f"SemEval validation recall: {recall:.4f}")
+    print(f"SemEval validation F1-score: {f1_score:.4f}")
+    # GenAI
+    accuracy, precision, recall, f1_score = evaluate(model, GenAI_val_dataloader, device)  # evaluate (via accuracy, precision, recall, f1-score) after each epoch using GenAI validation set
+    print(f"GenAI validation accuracy: {accuracy:.4f}")
+    print(f"GenAI validation precision: {precision:.4f}")
+    print(f"GenAI validation recall: {recall:.4f}")
+    print(f"GenAI validation F1-score: {f1_score:.4f}")
