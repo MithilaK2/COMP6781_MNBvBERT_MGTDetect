@@ -263,8 +263,8 @@ for epoch in range(epochs): # for each epoch
     print(f"GenAI validation recall: {recall:.4f}")
     print(f"GenAI validation F1-score: {f1_score:.4f}")
 
-
 # --TEST--
+# Evaluate performance on test set
 #creation of dataloader for testing
 SemEval_test_dataloader=DataLoader(list(zip(SemEval_test_data['input_ids'], SemEval_test_data['token_type_ids'], SemEval_test_data['attention_mask'],SemEval_test_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
 GenAI_test_dataloader=DataLoader(list(zip(GenAI_test_data['input_ids'], GenAI_test_data['token_type_ids'], GenAI_test_data['attention_mask'],GenAI_test_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
@@ -284,3 +284,41 @@ print(f"GenAI test accuracy: {accuracy:.4f}")
 print(f"GenAI test precision: {precision:.4f}")
 print(f"GenAI test recall: {recall:.4f}")
 print(f"GenAI test F1-score: {f1_score:.4f}")
+
+# Evaluate performance on training set
+#creation of dataloader for training set
+SemEval_train_dataloader=DataLoader(list(zip(SemEval_train_data['input_ids'], SemEval_train_data['token_type_ids'], SemEval_train_data['attention_mask'],SemEval_train_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
+GenAI_train_dataloader=DataLoader(list(zip(GenAI_train_data['input_ids'], GenAI_train_data['token_type_ids'], GenAI_train_data['attention_mask'],GenAI_train_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
+
+# SemEval
+accuracy, precision, recall, f1_score = evaluate(model, SemEval_train_dataloader,
+                                                 device)  # evaluate (via accuracy, precision, recall, f1-score) after each epoch using GenAI validation set
+print(f"SemEval train accuracy: {accuracy:.4f}")
+print(f"SemEval train precision: {precision:.4f}")
+print(f"SemEval train recall: {recall:.4f}")
+print(f"SemEval train F1-score: {f1_score:.4f}")
+
+# GenAI
+accuracy, precision, recall, f1_score = evaluate(model, GenAI_train_dataloader,
+                                                 device)  # evaluate (via accuracy, precision, recall, f1-score) after each epoch using GenAI validation set
+print(f"GenAI train accuracy: {accuracy:.4f}")
+print(f"GenAI train precision: {precision:.4f}")
+print(f"GenAI train recall: {recall:.4f}")
+print(f"GenAI train F1-score: {f1_score:.4f}")
+
+# Evaluate performance on validation set
+# SemEval
+accuracy, precision, recall, f1_score = evaluate(model, SemEval_val_dataloader,
+                                                 device)  # evaluate (via accuracy, precision, recall, f1-score) after each epoch using GenAI validation set
+print(f"SemEval validation accuracy: {accuracy:.4f}")
+print(f"SemEval validation precision: {precision:.4f}")
+print(f"SemEval validation recall: {recall:.4f}")
+print(f"SemEval validation F1-score: {f1_score:.4f}")
+
+# GenAI
+accuracy, precision, recall, f1_score = evaluate(model, GenAI_val_dataloader,
+                                                 device)  # evaluate (via accuracy, precision, recall, f1-score) after each epoch using GenAI validation set
+print(f"GenAI validation accuracy: {accuracy:.4f}")
+print(f"GenAI validation precision: {precision:.4f}")
+print(f"GenAI validation recall: {recall:.4f}")
+print(f"GenAI validation F1-score: {f1_score:.4f}")
