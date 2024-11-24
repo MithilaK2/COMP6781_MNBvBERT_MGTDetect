@@ -1,0 +1,298 @@
+Printed outputs for BERT:
+
+Batch size: 16 
+
+Learning rate: 2e-5 
+
+Number of epochs: 4 
+
+SemEval: 
+
+Epoch 1 loss: 0.19660641292583522 
+
+Epoch 2 loss: 0.08920960695666784 
+
+Epoch 3 loss: 0.04351301052866342 
+
+Epoch 4 loss: 0.027781258486621222 
+
+SemEval train accuracy: 0.9741 
+
+SemEval train precision: 0.9479 
+
+SemEval train recall: 0.9999 
+
+SemEval train F1-score: 0.9732 
+
+GenAI train accuracy: 0.7630 
+
+GenAI train precision: 0.8460 
+
+GenAI train recall: 0.7591 
+
+GenAI train F1-score: 0.8002 
+
+
+Batch size: 64 
+
+Learning rate: 5e-5 
+
+Number of epochs: 4 
+
+GenAI: 
+
+Epoch 1 loss: 0.268284150514688 
+
+Validation accuracy: 0.8950 
+
+Validation precision: 0.8686 
+
+Validation recall: 0.9801 
+
+Validation F1-score: 0.9210 
+
+Epoch 2 loss: 0.12340133058048514 
+
+Validation accuracy: 0.9228 
+
+Validation precision: 0.9074 
+
+Validation recall: 0.9760 
+
+Validation F1-score: 0.9404 
+
+Epoch 3 loss: 0.06382801543680441 
+
+Validation accuracy: 0.8994 
+
+Validation precision: 0.8755 
+
+Validation recall: 0.9779 
+
+Validation F1-score: 0.9239 
+
+Epoch 4 loss: 0.04486896073792436 
+
+Validation accuracy: 0.8730 
+
+Validation precision: 0.8384 
+
+Validation recall: 0.9869 
+
+Validation F1-score: 0.9066 
+
+
+Batch size: 64 
+
+Learning rate: 1e-4 
+
+Number of epochs: 4 
+
+GenAI: 
+
+Epoch 1 loss: 0.2950547747154776 
+
+Validation accuracy: 0.8032 
+
+Validation precision: 0.7628 
+
+Validation recall: 0.9939 
+
+Validation F1-score: 0.8631 
+
+Epoch 2 loss: 0.1524434616823052 
+
+Validation accuracy: 0.9184 
+
+Validation precision: 0.9191 
+
+Validation recall: 0.9532 
+
+Validation F1-score: 0.9358 
+
+Epoch 3 loss: 0.08700058149108185 
+
+Validation accuracy: 0.9032 
+
+Validation precision: 0.8898 
+
+Validation recall: 0.9644 
+
+Validation F1-score: 0.9256 
+
+Epoch 4 loss: 0.0635330991598859 
+
+Validation accuracy: 0.8756 
+
+Validation precision: 0.8442 
+
+Validation recall: 0.9821 
+
+Validation F1-score: 0.9079 
+
+
+Batch size: 16 
+
+Learning rate: 2e-5 
+
+Number of epochs: 4 
+
+GenAI: 
+
+Epoch 1 loss: 0.2604595884754781 
+
+Validation accuracy: 0.9168 
+
+Validation precision: 0.9022 
+
+Validation recall: 0.9721 
+
+Validation F1-score: 0.9359 
+
+Epoch 2 loss: 0.1244859385089675 
+
+Validation accuracy: 0.8846 
+
+Validation precision: 0.8514 
+
+Validation recall: 0.9875 
+
+Validation F1-score: 0.9144 
+
+Epoch 3 loss: 0.06356951713359976 
+
+Validation accuracy: 0.9176 
+
+Validation precision: 0.8985 
+
+Validation recall: 0.9785 
+
+Validation F1-score: 0.9368 
+
+Epoch 4 loss: 0.042437310195583965 
+
+Validation accuracy: 0.8860 
+
+Validation precision: 0.8556 
+
+Validation recall: 0.9833 
+
+Validation F1-score: 0.9151 
+
+
+Batch size: 16 
+
+Learning rate: 3e-5 
+
+Number of epochs: 4 
+
+GenAI: 
+
+Epoch 1 loss: 0.2700342517145819 
+
+Validation accuracy: 0.9018 
+
+Validation precision: 0.8827 
+
+Validation recall: 0.9718 
+
+Validation F1-score: 0.9251 
+
+Epoch 2 loss: 0.1276020058986912 
+
+Validation accuracy: 0.8826 
+
+Validation precision: 0.8475 
+
+Validation recall: 0.9901 
+
+Validation F1-score: 0.9133 
+
+Epoch 3 loss: 0.06763638570820375 
+
+Validation accuracy: 0.8990 
+
+Validation precision: 0.8695 
+
+Validation recall: 0.9862 
+
+Validation F1-score: 0.9242 
+
+Epoch 4 loss: 0.049573613577109016 
+
+Validation accuracy: 0.9048 
+
+Validation precision: 0.8819 
+
+Validation recall: 0.9785 
+
+Validation F1-score: 0.9277 
+
+Final:
+Batch size: 16 
+
+Learning rate: 2e-5 
+
+Epochs: 3 (based on peak performance in Epoch 3) 
+
+Results: 
+
+Epoch 1 loss: 0.18357921586264264 
+
+Epoch 2 loss: 0.08506410219977145 
+
+Epoch 3 loss: 0.05123755182468503 
+
+SemEval train accuracy: 0.9451 
+
+SemEval train precision: 0.9038 
+
+SemEval train recall: 0.9887 
+
+SemEval train F1-score: 0.9444 
+
+GenAI train accuracy: 0.9739 
+
+GenAI train precision: 0.9605 
+
+GenAI train recall: 0.9994 
+
+GenAI train F1-score: 0.9796 
+
+SemEval validation accuracy: 0.9452 
+
+SemEval validation precision: 0.9021 
+
+SemEval validation recall: 0.9988 
+
+SemEval validation F1-score: 0.9480 
+
+GenAI validation accuracy: 0.9356 
+
+GenAI validation precision: 0.9125 
+
+GenAI validation recall: 0.9920 
+
+GenAI validation F1-score: 0.9506 
+
+SemEval test accuracy: 0.5277 
+
+SemEval test precision: 0.5265 
+
+SemEval test recall: 0.9999 
+
+SemEval test F1-score: 0.6898 
+
+GenAI test accuracy: 0.9356 
+
+GenAI test precision: 0.9127 
+
+GenAI test recall: 0.9919 
+
+GenAI test F1-score: 0.9506 
+
+Training time:
+Epoch 1 3:39:52
+Epoch 2 5:41:30
+Epoch 3 3:20:16
+Epoch 4 3:17:15

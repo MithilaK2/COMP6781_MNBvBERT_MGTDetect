@@ -1,0 +1,222 @@
+Printed outputs for DistilBERT:
+
+Batch size=16 
+
+Learning rate = 2e-5
+
+Epochs: 5 
+
+SemEval: 
+
+Epoch 1 loss: 0.20275484375701067 
+
+SemEval validation accuracy: 0.6706 
+
+SemEval validation precision: 0.8023 
+
+SemEval validation recall: 0.4528 
+
+SemEval validation F1-score: 0.5789 
+
+Epoch 2 loss: 0.09906282961079584 
+
+SemEval validation accuracy: 0.7378 
+
+SemEval validation precision: 0.7910 
+
+SemEval validation recall: 0.6464 
+
+SemEval validation F1-score: 0.7114 
+
+Epoch 3 loss: 0.04885278296314815 
+
+SemEval validation accuracy: 0.7258 
+
+SemEval validation precision: 0.7510 
+
+SemEval validation recall: 0.6756 
+
+SemEval validation F1-score: 0.7113 
+
+Epoch 4 loss: 0.01410476378478805 
+
+SemEval validation accuracy: 0.7342 
+
+SemEval validation precision: 0.7560 
+
+SemEval validation recall: 0.6916 
+
+SemEval validation F1-score: 0.7224 
+
+Epoch 5 loss: 0.00998180130108259 
+
+SemEval validation accuracy: 0.7122 
+
+SemEval validation precision: 0.7725 
+
+SemEval validation recall: 0.6016 
+
+SemEval validation F1-score: 0.6764 
+
+
+Batch size=16 
+
+Learning rate = 3e-5 
+
+Epochs: 4 
+
+Epoch 1 loss: 0.20427432112780236 
+
+SemEval validation accuracy: 0.6872 
+
+SemEval validation precision: 0.8175 
+
+SemEval validation recall: 0.4820 
+
+SemEval validation F1-score: 0.6064 
+
+Epoch 2 loss: 0.0956566314941643 
+
+SemEval validation accuracy: 0.6896 
+
+SemEval validation precision: 0.7940 
+
+SemEval validation recall: 0.5120 
+
+SemEval validation F1-score: 0.6226 
+
+Epoch 3 loss: 0.04838491251764926 
+
+SemEval validation accuracy: 0.7346 
+
+SemEval validation precision: 0.8085 
+
+SemEval validation recall: 0.6148 
+
+SemEval validation F1-score: 0.6985 
+
+Epoch 4 loss: 0.02981418016601032 
+
+SemEval validation accuracy: 0.6864 
+
+SemEval validation precision: 0.8170 
+
+SemEval validation recall: 0.4804 
+
+SemEval validation F1-score: 0.6050 
+
+
+Batch size=64 
+
+Learning rate = 1e-4 
+
+Epochs: 4 
+
+Epoch 1 loss: 0.21815851992831972 
+
+SemEval validation accuracy: 0.6408 
+
+SemEval validation precision: 0.7825 
+
+SemEval validation recall: 0.3900 
+
+SemEval validation F1-score: 0.5206 
+
+Epoch 2 loss: 0.10114718311661297 
+
+SemEval validation accuracy: 0.6650 
+
+SemEval validation precision: 0.7785 
+
+SemEval validation recall: 0.4612 
+
+SemEval validation F1-score: 0.5793 
+
+Epoch 3 loss: 0.05623202185373744 
+
+SemEval validation accuracy: 0.6906 
+
+SemEval validation precision: 0.8064 
+
+SemEval validation recall: 0.5016 
+
+SemEval validation F1-score: 0.6185 
+
+Epoch 4 loss: 0.03665717608277595 
+
+SemEval validation accuracy: 0.6996 
+
+SemEval validation precision: 0.7908 
+
+SemEval validation recall: 0.5428 
+
+SemEval validation F1-score: 0.6437 
+
+Final:
+Batch Size: 16 
+
+Learning Rate: 2e-5 
+
+Epochs: 4 
+
+Epoch 1 loss: 0.1951358327368377 
+
+Epoch 2 loss: 0.09196683544187002 
+
+Epoch 3 loss: 0.052119154679756946 
+
+Epoch 4 loss: 0.03794840637441514 
+
+SemEval train accuracy: 0.9422 
+
+SemEval train precision: 0.8965 
+
+SemEval train recall: 0.9919 
+
+SemEval train F1-score: 0.9418 
+
+GenAI train accuracy: 0.9781 
+
+GenAI train precision: 0.9666 
+
+GenAI train recall: 0.9995 
+
+GenAI train F1-score: 0.9828 
+
+SemEval validation accuracy: 0.9362 
+
+SemEval validation precision: 0.8874 
+
+SemEval validation recall: 0.9992 
+
+SemEval validation F1-score: 0.9400 
+
+GenAI validation accuracy: 0.9378 
+
+GenAI validation precision: 0.9158 
+
+GenAI validation recall: 0.9916 
+
+GenAI validation F1-score: 0.9522 
+
+SemEval test accuracy: 0.5285 
+
+SemEval test precision: 0.5270 
+
+SemEval test recall: 0.9997 
+
+SemEval test F1-score: 0.6901 
+
+GenAI test accuracy: 0.9395 
+
+GenAI test precision: 0.9179 
+
+GenAI test recall: 0.9920 
+
+GenAI test F1-score: 0.9535 
+
+Training time:
+Epoch 1 2:25:04
+Epoch 2  1:34:06
+Epoch 3  1:36:06
+Epoch 4  1:35:11
