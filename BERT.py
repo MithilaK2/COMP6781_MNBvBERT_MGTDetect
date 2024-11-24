@@ -8,7 +8,18 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm # shows progress bar
 import numpy as np
 
-# TODO: Change file_path to be via argparse.ArgumentParser() for COMMANDLINE, must also provide instructions on how to download the files from SemEval and GenAI github/google drive
+"""
+Download the necessary datasets from the following links:
+
+# SemEval
+- Training data: https://drive.google.com/file/d/1HeCgnLuDoUHhP-2OsTSSC3FXRLVoI6OG/view?usp=drive_link
+- Development data: https://drive.google.com/file/d/1e_G-9a66AryHxBOwGWhriePYCCa4_29e/view?usp=drive_link
+- Test data: https://drive.google.com/file/d/1-TN7sfSK1BuYHXlqxHHfwjEIE0JfarPk/view?usp=drive_link
+
+# GenAI
+- Training data: https://drive.google.com/file/d/1o8LE5p5xRdEFGrZOKiY4In2xW2BiWJbG/view?usp=drive_link
+- Development data: https://drive.google.com/file/d/1hYIHqU3IMnJjPMTvl99K8pQUIOe7a957/view?usp=drive_link
+"""
 
 #--LOAD DATA--
 # Get text data and corresponding labels from JSONL file (for train and validation sets)
@@ -34,17 +45,18 @@ def get_texts_labels(file_path):
 
     return texts, labels
 
-# Path to JSONL files (can be modified later to load via command line)
-SemEval_train_file_path = 'SemEval_data/subtaskA_train_monolingual.jsonl' # SemEval train
-SemEval_val_file_path = 'SemEval_data/subtaskA_dev_monolingual.jsonl' # SemEval val
-SemEval_test_file_path = 'SemEval_data/subtaskA_monolingual.jsonl' # SemEval test
-GenAI_train_file_path = 'GenAI_data/en_train.jsonl' # GenAI train
-GenAI_val_file_path = 'GenAI_data/en_dev.jsonl' # GenAI val
+# Path to JSONL files
+# Please update the file paths according to where you saved the files on your computer
+SemEval_train_file_path = 'subtaskA_train_monolingual.jsonl'  # SemEval train
+SemEval_val_file_path = 'subtaskA_dev_monolingual.jsonl'      # SemEval val
+SemEval_test_file_path = 'subtaskA_monolingual.jsonl'         # SemEval test
+GenAI_train_file_path = 'en_train.jsonl'                         # GenAI train
+GenAI_val_file_path = 'en_dev.jsonl'                             # GenAI val
 
-# Create the datasets and corresponding labels (if applicable)
+# Create the datasets and corresponding labels
 SemEval_train_texts, SemEval_train_labels = get_texts_labels(SemEval_train_file_path) # SemEval train
 SemEval_val_texts, SemEval_val_labels = get_texts_labels(SemEval_val_file_path) # SemEval val
-SemEval_test_texts, SemEval_test_labels = get_texts_labels(SemEval_test_file_path)  # SemEval test, we use get_texts for the test set (no labels)
+SemEval_test_texts, SemEval_test_labels = get_texts_labels(SemEval_test_file_path)  # SemEval test
 GenAI_train_texts, GenAI_train_labels = get_texts_labels(GenAI_train_file_path) # GenAI train
 GenAI_val_texts, GenAI_val_labels = get_texts_labels(GenAI_val_file_path) # GenAI val
 # Randomly sample (via stratified sampling) GenAI train and val data so that it is a manageable subset for hyperparameter tuning (faster runtimes for quicker results)
@@ -96,14 +108,14 @@ BERT's tokenizer converts each input text as follows:
                      padding tokens are meaningless and can be ignored, which is what attention_masks allows the model to do
 """
 bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-# Preprocess the texts and labels (if applicable) using BERT's tokenizer
+# Preprocess the texts and labels using BERT's tokenizer
 def preprocess_function(texts, tokenizer, max_length=128):
     """
     Method to preprocess the data by tokenizing texts and preparing inputs.
     Args:
     texts : list : list of text samples
     labels : list : list of integer labels
-    max_length : int : maximum sequence length for tokenized input, default=128 from SOURCE DOCUMENTATION!!
+    max_length : int : maximum sequence length for tokenized input, default=128
     Returns:
     inputs : dict : dictionary containing tokenized inputs
     """
@@ -152,12 +164,12 @@ class BERT_Text_Classifier(nn.Module):
     def __init__(self, num_classes):
         super().__init__()
         self.bert = BertModel.from_pretrained('bert-base-uncased')  # load pre-trained BERT model # NOTE GETTING A WARNING ABOUT NEEDING RENAME WEIGHTS AND BIAS!!
-        self.hidden_dim = self.bert.config.hidden_size # dimension of hidden layer DOCUMENTATION
+        self.hidden_dim = self.bert.config.hidden_size # dimension of hidden layer
         self.linear = nn.Linear(self.hidden_dim, num_classes)  # linear layer for classification
 
     def forward(self, input_ids, attention_mask, token_type_ids):
-        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask,token_type_ids=token_type_ids)  # pass input through BERT (feedforward) DOCUMENTATION
-        cls_output = outputs[1]  # get [CLS] token output for classification, it is a pooled output (summary of the input sequence) for classification  DOCUMENTATION
+        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask,token_type_ids=token_type_ids)  # pass input through BERT (feedforward)
+        cls_output = outputs[1]  # get [CLS] token output for classification, it is a pooled output (summary of the input sequence) for classification
         # note outputs[0] gives the last hidden states for all tokens
         out = self.linear(cls_output)  # Pass through linear layer
         return out  # return logit outputs
@@ -170,14 +182,14 @@ train_label_data = GenAI_train_label_data # chosen (labels of) train data (SemEv
 batch_size = 16 # batch size
 
 # DataLoader is a utility that handles batching and shuffling of data during training.
-# this allows training/validation/testing on data [batch_size] (input data, label) pairs at a time (simultaneously) instead one pair at a time in one epoch
+# this allows training/validation on data [batch_size] (input data, label) pairs at a time (simultaneously) instead one pair at a time in one epoch
 train_dataloader=DataLoader(list(zip(train_data['input_ids'], train_data['token_type_ids'], train_data['attention_mask'],train_label_data)),batch_size=batch_size,shuffle=True) # dataloader for train
 SemEval_val_dataloader=DataLoader(list(zip(SemEval_val_data['input_ids'], SemEval_val_data['token_type_ids'], SemEval_val_data['attention_mask'],SemEval_val_label_data)),batch_size=batch_size,shuffle=True) # dataloader for SemEval validation
 GenAI_val_dataloader=DataLoader(list(zip(GenAI_val_data['input_ids'], GenAI_val_data['token_type_ids'], GenAI_val_data['attention_mask'],GenAI_val_label_data)),batch_size=batch_size,shuffle=True) # dataloader for GenAI validation
 
 # Evaluate model on dataset
 def evaluate(model, dataloader, device):
-    model.eval()  # set model to evaluation mode DOCUMENTATION
+    model.eval()  # set model to evaluation mode
     correct = 0  # keep track of the number of texts that are predicted correctly
     total = 0  # keep track of the number of texts that are actually processed successfully
 
@@ -192,7 +204,7 @@ def evaluate(model, dataloader, device):
             correct += (predictions == label).sum().item() # count how many correct predictions have been made for current batch
             total += len(label) # count how many total predictions have been made, which is basically the length of label tensor across batches
 
-            # Store predictions and labels for metrics (we make sure to move to CPU first o convert tensor to numpy array, making a numpy array for each batch)
+            # Store predictions and labels for metrics (we make sure to move to CPU first to convert tensor to numpy array, making a numpy array for each batch)
             all_predictions.extend(predictions.cpu().numpy())
             all_labels.extend(label.cpu().numpy())
 
@@ -220,7 +232,7 @@ def evaluate(model, dataloader, device):
 # Initialize model, loss function, and optimizer
 device = torch.device("cuda" if torch.cuda.is_available()
                       else "mps" if torch.backends.mps.is_available()
-                      else "cpu") # creates device #CAUTION: RUN THIS CODE WITH GPU, CPU WILL TAKE TOO LONG
+                      else "cpu") # creates device
 model = BERT_Text_Classifier(2).to(device) # moves initialized model (binary classifier where Machine text = label 1 and Human text = label 0) to device
 loss_function = nn.CrossEntropyLoss() # initialize loss function (which is Cross Entropy)
 optimizer = torch.optim.Adam(model.parameters(), lr=2e-5) # better version of SGD (Stochastic Gradient Descent)
@@ -228,10 +240,10 @@ epochs = 3 # define maximum number of epochs
 
 # Training loop
 for epoch in range(epochs): # for each epoch
-    model.train() # set model to train mode DOCUMENTATION
+    model.train() # set model to train mode
     total_loss = 0 # initialize total loss
 
-    for input_ids, token_type_ids, attention_mask, label in tqdm(train_dataloader): # for each batch of (surrounding, target) pairs
+    for input_ids, token_type_ids, attention_mask, label in tqdm(train_dataloader): # for each batch of (input_ids, token_type_ids, attention_mask, label) tuples
         #TODO: create code for training our model
 
         # TRAIN
@@ -266,8 +278,8 @@ for epoch in range(epochs): # for each epoch
 # --TEST--
 # Evaluate performance on test set
 #creation of dataloader for testing
-SemEval_test_dataloader=DataLoader(list(zip(SemEval_test_data['input_ids'], SemEval_test_data['token_type_ids'], SemEval_test_data['attention_mask'],SemEval_test_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
-GenAI_test_dataloader=DataLoader(list(zip(GenAI_test_data['input_ids'], GenAI_test_data['token_type_ids'], GenAI_test_data['attention_mask'],GenAI_test_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
+SemEval_test_dataloader=DataLoader(list(zip(SemEval_test_data['input_ids'], SemEval_test_data['token_type_ids'], SemEval_test_data['attention_mask'],SemEval_test_label_data)),batch_size=batch_size,shuffle=True)
+GenAI_test_dataloader=DataLoader(list(zip(GenAI_test_data['input_ids'], GenAI_test_data['token_type_ids'], GenAI_test_data['attention_mask'],GenAI_test_label_data)),batch_size=batch_size,shuffle=True)
 
 # SemEval
 accuracy, precision, recall, f1_score = evaluate(model, SemEval_test_dataloader,
@@ -287,8 +299,8 @@ print(f"GenAI test F1-score: {f1_score:.4f}")
 
 # Evaluate performance on training set
 #creation of dataloader for training set
-SemEval_train_dataloader=DataLoader(list(zip(SemEval_train_data['input_ids'], SemEval_train_data['token_type_ids'], SemEval_train_data['attention_mask'],SemEval_train_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
-GenAI_train_dataloader=DataLoader(list(zip(GenAI_train_data['input_ids'], GenAI_train_data['token_type_ids'], GenAI_train_data['attention_mask'],GenAI_train_label_data)),batch_size=batch_size,shuffle=True) #Here please change batch size depending of your GPU capacities (if GPU runs out of memory lower batch_size)
+SemEval_train_dataloader=DataLoader(list(zip(SemEval_train_data['input_ids'], SemEval_train_data['token_type_ids'], SemEval_train_data['attention_mask'],SemEval_train_label_data)),batch_size=batch_size,shuffle=True)
+GenAI_train_dataloader=DataLoader(list(zip(GenAI_train_data['input_ids'], GenAI_train_data['token_type_ids'], GenAI_train_data['attention_mask'],GenAI_train_label_data)),batch_size=batch_size,shuffle=True)
 
 # SemEval
 accuracy, precision, recall, f1_score = evaluate(model, SemEval_train_dataloader,
