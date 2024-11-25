@@ -171,7 +171,7 @@ class DistilBERT_Text_Classifier(nn.Module):
         # pass input through DistilBERT
         outputs = self.distilbert(input_ids=input_ids, attention_mask=attention_mask) # note no token_type_ids unlike BERT. This is because DistilBERT pre-trained removes the NSP objective as NSP was found to contribute less to downstream performance
         cls_output = outputs.last_hidden_state[:, 0, :]
-        # Extract [CLS] token's output (first token of the last hidden state) for classification
+        # Extract [CLS] token (first token of last hidden layer) for classification
         # In DistilBERT, since it was not pre-trained on NSP objective, the [CLS] token represents
         # aggregated contextual information derived from self-attention mechanism during pre-training on the MLM objective.
         out = self.linear(cls_output)  # pass through linear layer
