@@ -75,6 +75,8 @@ def time_to_seconds(time_str):
 # Convert time for BERT and DistilBERT to seconds for plotting
 bert_times = [time_to_seconds(t[1]) for t in time_data["BERT"]]  # training time (in seconds) per epoch for BERT
 distilbert_times = [time_to_seconds(t[1]) for t in time_data["DistilBERT"]]  # training time (in seconds) per epoch for DistilBERT
+MNB_semeval_time = [144.67]
+MNB_genai_time = [80.97]
 
 # 3x2 grid of subplots for combined plotting
 fig, axes = plt.subplots(3, 2, figsize=(15, 18))
@@ -108,6 +110,8 @@ for idx, metric in enumerate(["loss", "accuracy"]):
 ax = axes[2, 0]
 ax.plot(range(1, len(bert_times) + 1), bert_times, marker='o', label="BERT", color="blue") # training time for BERT
 ax.plot(range(1, len(distilbert_times) + 1), distilbert_times, marker='o', label="DistilBERT", color="orange") # training time for DistilBERT
+ax.plot(range(1, len(MNB_semeval_time) + 1), MNB_semeval_time, marker='o', label="MNB SemEval", color="green") # training time for MNB SemEval
+ax.plot(range(1, len(MNB_genai_time) + 1), MNB_genai_time, marker='o', label="MNB GenAI", color="red") # training time for MNB GenAI
 ax.set_title("Time per Epoch", fontsize=10)
 ax.set_xlabel("Epochs", fontsize=9)
 ax.set_ylabel("Time (seconds)", fontsize=9)
